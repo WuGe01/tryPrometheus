@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Prometheus\Collectors\Horizon\CurrentMasterSupervisorCollector;
 use Spatie\Prometheus\Collectors\Horizon\CurrentProcessesPerQueueCollector;
@@ -20,9 +21,9 @@ class PrometheusServiceProvider extends ServiceProvider
          * Here you can register all the exporters that you
          * want to export to prometheus
          */
-        Prometheus::addGauge('My gauge')
-            ->value(function() {
-                return 123.45;
+        Prometheus::addGauge('api_requests_total')
+            ->value(function () {
+                return Redis::llen('api_requests_log');
             });
 
         /*
