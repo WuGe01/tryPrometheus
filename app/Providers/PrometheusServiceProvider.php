@@ -26,6 +26,13 @@ class PrometheusServiceProvider extends ServiceProvider
                 return Redis::llen('api_requests_log');
             });
 
+        Prometheus::addGauge('recent_api_requests')
+            ->value(function () {
+                $logs = Redis::lrange('api_requests_log', 0, 1); // 獲取最近 1 條請求
+
+                return print_r($logs);
+            });
+
         /*
          * Uncomment this line if you want to export
          * all Horizon metrics to prometheus

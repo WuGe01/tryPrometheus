@@ -28,6 +28,7 @@ class LogApiRequests
 
         // 儲存到 Redis (使用列表結構)
         $key = 'api_requests_log';
+
         Redis::lpush($key, json_encode($logData));
 
         return $next($request);
