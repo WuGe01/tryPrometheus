@@ -16,21 +16,28 @@ class LogApiRequests
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // 收集請求資訊
-        $logData = [
-            'method' => $request->method(),
-            'url' => $request->fullUrl(),
-            'headers' => $request->headers->all(),
-            'body' => $request->all(),
-            'ip' => $request->ip(),
-            'timestamp' => now()->toDateTimeString(),
-        ];
+        // 執行請求，獲取回應
+        $response = $next($request);
 
-        // 儲存到 Redis (使用列表結構)
-        $key = 'api_requests_log';
+        // 如果回應的狀態碼不是 200，則記錄錯誤資訊
+        if ($response->getStatusCode() !== 200) {
+            $logData = [
+                'method' => $request->method(),
+                'url' => $request->fullUrl(),
+                'headers' => $request->headers->all(),
+                'body' => $request->all(),
+                'ip' => $request->ip(),
+                'timestamp' => now()->toDateTimeString(),
+                'status_code' => $response->getStatusCode(), // 回應狀態碼
+                'error_message' => $response->getContent(), // 回應訊息內容（用於查看錯誤詳細資訊）
+            ];
 
-        Redis::lpush($key, json_encode($logData));
+            // 儲存到 Redis (使用列表結構)
+            $key = 'api_requests_log';
+            Redis::lpush($key, json_encode($logData));
+        }
 
-        return $next($request);
+        // 返回回應
+        return $response;
     }
 }
