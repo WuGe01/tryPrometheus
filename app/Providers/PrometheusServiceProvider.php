@@ -26,6 +26,21 @@ class PrometheusServiceProvider extends ServiceProvider
                 return Redis::llen('api_requests_log');
             });
 
+        Prometheus::addGauge('api_requests_detail')
+            ->label('status_code')
+            ->value(function () {
+
+            // 從 Redis 中獲取 status_code 的統計數據
+            $statusCodeKey = 'api_requests_status_code';
+            $statusCodes = Redis::hgetall($statusCodeKey); // 獲取所有 status_code 的統計
+
+            $return = [];
+            foreach ($statusCodes as $key => $statusCode) {
+                $return[] = [ $statusCode, [$key]];
+            }
+
+            return $return;
+        });
 
         /*
          * Uncomment this line if you want to export
