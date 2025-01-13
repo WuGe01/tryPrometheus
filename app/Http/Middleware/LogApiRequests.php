@@ -19,8 +19,14 @@ class LogApiRequests
         // 執行請求，獲取回應
         $response = $next($request);
 
+        // Redis::lpush('api_requests_log', json_encode([
+        //     'method' => $request->method(),
+        //     'url' => $request->fullUrl(),
+        //     'timestamp' => now()->toDateTimeString(),
+        // ]));
+
         // 如果回應的狀態碼不是 200，則記錄錯誤資訊
-        if ($response->getStatusCode() !== 200) {
+        // if ($response->getStatusCode() !== 200) {
             $logData = [
                 'method' => $request->method(),
                 'url' => $request->fullUrl(),
@@ -35,7 +41,7 @@ class LogApiRequests
             // 儲存到 Redis (使用列表結構)
             $key = 'api_requests_log';
             Redis::lpush($key, json_encode($logData));
-        }
+        // }
 
         // 返回回應
         return $response;
