@@ -1,17 +1,24 @@
 services:
   app:
-    image: php:8.2-apache
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: laravel_app:latest
     container_name: laravel_app
-    working_dir: /var/www/html
+    ports:
+      - "8000:8000"
     volumes:
       - .:/var/www/html
-      - ./config/laravel.conf:/etc/apache2/sites-available/000-default.conf
-    environment:
-      APACHE_DOCUMENT_ROOT: /var/www/html/public
-    ports:
-      - "8080:80"
-    networks:
-      - laravel
+    depends_on:
+      - redis
 
-networks:
-  laravel:
+  redis:
+    image: redis:latest
+    container_name: laravel_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
