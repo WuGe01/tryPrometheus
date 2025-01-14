@@ -11,6 +11,8 @@ services:
       - .:/var/www/html
     depends_on:
       - redis
+    networks:
+      - laravel
 
   redis:
     image: redis:latest
@@ -19,6 +21,12 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - laravel
 
 volumes:
   redis_data:
+
+networks:
+  laravel:
+    driver: bridge

@@ -22,7 +22,9 @@ RUN apt-get update && \
     bcmath \
     gd \
     zip \
-    sockets
+    sockets \
+    && pecl install redis && \
+    docker-php-ext-enable redis
 
 # 安裝 Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
